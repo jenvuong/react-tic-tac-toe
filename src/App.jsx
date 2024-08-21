@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 function Square({ value, onSquareClick }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button className="square text-sky-400" onClick={onSquareClick}>
       {value}
     </button>
   )
@@ -30,24 +30,33 @@ function Board({ xIsNext, squares, onPlay }) {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O')
   }
 
+  // Render 3 rows
+  const rows = [...Array(3)].map((x, i) => {
+    // Render 3 squares
+    const rowSquares = [...Array(3)].map((x, j) => {
+      return (
+        <Square
+          key={3 * i + j}
+          value={squares[3 * i + j]}
+          onSquareClick={() => handleClick(3 * i + j)}
+        />
+      )
+    })
+
+    return (
+      <div key={i} className="board-row">
+        {rowSquares}
+      </div>
+    )
+  })
+
+  // Board component returns
   return (
     <>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
+      <div className="status mb-8 text-2xl text-sky-300 text-center md:mb-14">
+        {status}
       </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
+      {rows}
     </>
   )
 }
@@ -73,28 +82,49 @@ export default function Game() {
     if (move > 0) {
       description = 'Go to move #' + move
     } else {
-      description = 'Go to game start'
+      description = 'Go to beginning'
     }
 
     return currentMove === move && move > 0 ? (
-      <li key={move}>You are at move #{move}</li>
+      <li key={move} className="list-item text-slate-200">
+        You are at move #{move}
+      </li>
     ) : (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
+      <li key={move} className="list-item ">
+        <button
+          onClick={() => jumpTo(move)}
+          className="moves-btn hover:text-slate-200"
+        >
+          {description}
+        </button>
       </li>
     )
   })
 
   return (
-    <div className="game">
+    <div className="game container mx-auto flex flex-col space-y-12 justify-center items-center md:mt-10 md:flex-row md:items-start md:justify-evenly md:space-y-0">
+      <h1 className="text-2xl font-bold">Tic Tac Toe</h1>
       <div className="game-board">
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
-      <div className="game-info">
-        <ol>{moves}</ol>
+      <div className="game-info flex flex-col space-y-8 items-center text-xs">
+        <h2 className="text-slate-300 text-lg md:mb-8">Game history:</h2>
+        <ol className="space-y-4 text-slate-500 bg-slate-800 py-4 px-6">
+          {moves}
+        </ol>
+        <button
+          onClick={resetGame}
+          className="p-3 w-full mt-5 bg-slate-800 hover:bg-sky-800"
+        >
+          Reset game
+        </button>
       </div>
     </div>
   )
+}
+
+function resetGame() {
+  console.log(history)
 }
 
 function calculateWinner(squares) {
