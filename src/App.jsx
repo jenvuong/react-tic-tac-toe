@@ -11,7 +11,7 @@ function Square({ value, onSquareClick }) {
   )
 }
 
-function Board({ xIsNext, squares, onPlay }) {
+function Board({ xIsNext, squares, onPlay, currentMove }) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return
@@ -26,9 +26,12 @@ function Board({ xIsNext, squares, onPlay }) {
   }
 
   const winner = calculateWinner(squares)
+  const draw = currentMove === 9
   let status
   if (winner) {
     status = 'Winner: ' + winner
+  } else if (draw) {
+    status = "It's a Draw!"
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O')
   }
@@ -80,6 +83,11 @@ export default function Game() {
     setCurrentMove(nextMove)
   }
 
+  function handleReset() {
+    setHistory([Array(9).fill(null)])
+    setCurrentMove(0)
+  }
+
   const moves = history.map((squares, move) => {
     let description
     if (move > 0) {
@@ -108,26 +116,27 @@ export default function Game() {
     <div className="game container mx-auto flex flex-col space-y-12 justify-center items-center md:mt-10 md:flex-row md:items-start md:justify-evenly md:space-y-0">
       <h1 className="text-2xl font-bold">Tic Tac Toe</h1>
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board
+          xIsNext={xIsNext}
+          squares={currentSquares}
+          onPlay={handlePlay}
+          currentMove={currentMove}
+        />
       </div>
-      <div className="game-info flex flex-col space-y-8 items-center text-xs">
-        <h2 className="text-slate-300 text-lg md:mb-8">Game history:</h2>
+      <div className="game-info flex flex-col items-center text-xs">
+        <h2 className="text-slate-300 text-lg md:mb-16">Game history:</h2>
         <ol className="space-y-4 text-slate-500 bg-slate-800 py-4 px-6">
           {moves}
         </ol>
         <button
-          onClick={resetGame}
-          className="p-3 w-full mt-5 bg-slate-800 hover:bg-sky-800"
+          onClick={() => handleReset()}
+          className="p-3 w-full mt-4 bg-slate-800 hover:bg-sky-800"
         >
           Reset game
         </button>
       </div>
     </div>
   )
-}
-
-function resetGame() {
-  console.log(history)
 }
 
 function calculateWinner(squares) {
