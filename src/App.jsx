@@ -132,7 +132,7 @@ export default function Game() {
           onClick={() => handleReset()}
           className="p-3 w-full mt-4 bg-slate-800 hover:bg-sky-800"
         >
-          Rest game
+          Reset game
         </button>
       </div>
     </div>
