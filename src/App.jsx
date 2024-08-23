@@ -11,7 +11,14 @@ function Square({ value, onSquareClick }) {
   )
 }
 
-function Board({ xIsNext, squares, onPlay, currentMove }) {
+function Board({
+  xIsNext,
+  squares,
+  onPlay,
+  currentMove,
+  scores,
+  updateScores,
+}) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return
@@ -32,6 +39,7 @@ function Board({ xIsNext, squares, onPlay, currentMove }) {
     status = 'Winner: ' + winner
   } else if (draw) {
     status = "It's a Draw!"
+    updateScores()
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O')
   }
@@ -59,10 +67,21 @@ function Board({ xIsNext, squares, onPlay, currentMove }) {
   // Board component returns
   return (
     <>
-      <div className="status mb-8 text-2xl text-sky-300 text-center md:mb-14">
+      <div className="status mb-6 text-2xl text-sky-300 text-center md:mb-14">
         {status}
       </div>
       {rows}
+      <div className="flex justify-between mt-8 px-2 font-bold text-slate-400 text-md">
+        <div>
+          Player X : <span className="text-sky-500 font-bold">{scores.X}</span>
+        </div>
+        <div>
+          Player O : <span className="text-sky-500 font-bold">{scores.O}</span>
+        </div>
+        <div>
+          Draw : <span className="text-sky-500 font-bold">{scores.draw}</span>
+        </div>
+      </div>
     </>
   )
 }
@@ -72,6 +91,11 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0)
   const xIsNext = currentMove % 2 === 0
   const currentSquares = history[currentMove]
+  const [scores, setScores] = useState({
+    X: 0,
+    O: 0,
+    draw: 0,
+  })
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares]
@@ -86,6 +110,13 @@ export default function Game() {
   function handleReset() {
     setHistory([Array(9).fill(null)])
     setCurrentMove(0)
+  }
+
+  function updateScores() {
+    setScores({
+      ...scores,
+      draw: 1,
+    })
   }
 
   const moves = history.map((squares, move) => {
@@ -121,10 +152,12 @@ export default function Game() {
           squares={currentSquares}
           onPlay={handlePlay}
           currentMove={currentMove}
+          scores={scores}
+          updateScores={updateScores}
         />
       </div>
       <div className="game-info flex flex-col items-center text-xs">
-        <h2 className="text-slate-300 text-lg md:mb-16">Game history:</h2>
+        <h2 className="mb-4 text-slate-300 text-lg md:mb-16">Game history:</h2>
         <ol className="space-y-4 text-slate-500 bg-slate-800 py-4 px-6">
           {moves}
         </ol>
