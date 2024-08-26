@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Square({ value, onSquareClick }) {
   return (
@@ -11,14 +11,7 @@ function Square({ value, onSquareClick }) {
   )
 }
 
-function Board({
-  xIsNext,
-  squares,
-  onPlay,
-  currentMove,
-  scores,
-  updateScores,
-}) {
+function Board({ xIsNext, squares, onPlay, currentMove, scores }) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return
@@ -39,7 +32,6 @@ function Board({
     status = 'Winner: ' + winner
   } else if (draw) {
     status = "It's a Draw!"
-    updateScores()
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O')
   }
@@ -112,13 +104,6 @@ export default function Game() {
     setCurrentMove(0)
   }
 
-  function updateScores() {
-    setScores({
-      ...scores,
-      draw: 1,
-    })
-  }
-
   const moves = history.map((squares, move) => {
     let description
     if (move > 0) {
@@ -153,7 +138,6 @@ export default function Game() {
           onPlay={handlePlay}
           currentMove={currentMove}
           scores={scores}
-          updateScores={updateScores}
         />
       </div>
       <div className="game-info flex flex-col items-center text-xs">
